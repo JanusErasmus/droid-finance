@@ -8,14 +8,17 @@
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_gravity="center">
+        android:layout_gravity="center"
+        android:weightSum="1">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Large Text"
-            android:id="@+id/budget_name"
-            android:layout_gravity="center_horizontal" />
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="499dp"
+            android:id="@+id/file_list"
+            android:layout_gravity="top"
+            android:layout_weight="0.80" />
     </LinearLayout>
+
+
+
 </FrameLayout>

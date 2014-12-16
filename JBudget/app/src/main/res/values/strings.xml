@@ -12,5 +12,6 @@
     <string name="button_trans_add">Add</string>
     <string name="string_trans_desc">Description</string>
     <string name="string_trans_amount">R 0 .00</string>
+    <string name="saved_file_name">com.janus.jbudget.file_name</string>
 
 </resources>

@@ -1,11 +1,14 @@
 package com.janus.jbudget;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -41,7 +44,14 @@ public class MainActivity extends ActionBarActivity
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
+        String fileName;
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        fileName = sharedPref.getString(getString(R.string.saved_file_name), "");
+
         JBudget.init();
+
+        if(!fileName.isEmpty())
+            JBudget.get().open(fileName);
     }
 
     @Override
@@ -65,7 +75,7 @@ public class MainActivity extends ActionBarActivity
             case 2:
             {
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                        .replace(R.id.container, FilesFragment.newInstance(position + 1))
                         .commit();
             }
             break;
@@ -90,6 +100,18 @@ public class MainActivity extends ActionBarActivity
                 mTitle = getString(R.string.title_files);
                 break;
         }
+    }
+
+    public void showSummary()
+    {
+        ActionBar actionBar = getSupportActionBar();
+        mTitle = getString(R.string.title_summary);
+        actionBar.setTitle(mTitle);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.container, SummaryFragment.newInstance(1))
+                .commit();
     }
 
     public void restoreActionBar() {
@@ -130,7 +152,12 @@ public class MainActivity extends ActionBarActivity
 
     public void onStop() {
         //save the budget
-        JBudget.get().save();
+        String fileName = JBudget.get().save();
+
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(getString(R.string.saved_file_name), fileName);
+        editor.commit();
 
         super.onStop();
     }

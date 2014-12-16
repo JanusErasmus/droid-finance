@@ -46,4 +46,17 @@ public class SummaryFragment extends Fragment {
         //this is part of index 0 in the MainActivity, let MainActivity know this was attached
         ((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
     }
+
+    public void onResume() {
+        super.onResume();
+
+        TextView name = (TextView) getView().findViewById(R.id.budget_name);
+        String nameString = JBudget.get().getName();
+
+        if( nameString.lastIndexOf('.') > 0)
+            nameString = nameString.substring(0, nameString.lastIndexOf('.'));
+
+        name.setText(nameString);
+
+    }
 }
