@@ -60,7 +60,7 @@ public class TransactionFragment extends Fragment {
 
         JTransArrayAdapter adapter = new JTransArrayAdapter(
                 getActivity(),
-                JBudget.get().getTransactionList()
+                JBudget.get().transactionList
         );
 
 

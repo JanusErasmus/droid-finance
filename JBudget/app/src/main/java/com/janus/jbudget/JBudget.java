@@ -23,8 +23,10 @@ public class JBudget {
 
     static private JBudget __instance = null;
 
-    private List<JTransaction> transactionList;
-    private String mName;
+    public List<JTransaction> transactionList;
+    public List<JCategory> categories;
+    public String name;
+
     private String mFileName;
     private int mVersion;
     private float mIncome;
@@ -41,9 +43,11 @@ public class JBudget {
     }
 
     private JBudget() {
-        transactionList = new ArrayList<JTransaction>();
 
-        mName = "Empty Budget";
+        transactionList = new ArrayList<JTransaction>();
+        categories = new ArrayList<JCategory>();
+
+        name = "Empty Budget";
         mVersion = -1;
     }
 
@@ -53,7 +57,7 @@ public class JBudget {
         mFileName = fileName;
 
         File budget = new File(fileName);
-        mName = budget.getName();
+        name = budget.getName();
 
         int len = 0;
         int size = (int)budget.length();
@@ -88,14 +92,6 @@ public class JBudget {
             populateBudget(buffer, len);
 
         return false;
-    }
-
-    public List<JTransaction> getTransactionList() {
-        return transactionList;
-    }
-
-    public String getName() {
-        return mName;
     }
 
     private void populateBudget(byte buff[], int len) {
@@ -145,6 +141,9 @@ public class JBudget {
         int transBuffLen = transCount * 106;
         byte transBuff[] = Arrays.copyOfRange(buff, 16, (16 + transBuffLen));
         fillTransactions(transBuff, transCount);
+
+        byte catBuff[] = Arrays.copyOfRange(buff, (16 + transBuffLen), buff.length);
+        fillCategories(catBuff);
     }
 
     private void fillTransactions(byte buff[], int len) {
@@ -194,7 +193,7 @@ public class JBudget {
         intBytes = Arrays.copyOfRange(buff, 6, 70);
         desc = new String(intBytes).replaceAll("\u0000.*", "");
 
-        //next 32 bytes is the description
+        //next 32 bytes is the category
         intBytes = Arrays.copyOfRange(buff, 70, 102);
         cat =  new String(intBytes).replaceAll("\u0000.*", "");
 
@@ -208,6 +207,71 @@ public class JBudget {
         JTransaction tr = new JTransaction(desc, cat, amount);
         return tr;
     }
+
+    private void fillCategories(byte buff[]) {
+
+        byte intBytes[];
+        ByteBuffer bb;
+        String cat;
+
+        int start = 0;
+        int end = 0;
+
+        while(end < buff.length) {
+
+            //first 4 bytes is the amount of categories in the list
+            start = end;
+            end += 4;
+            intBytes = Arrays.copyOfRange(buff, start, end);
+            bb = ByteBuffer.wrap(intBytes);
+            bb = bb.order(ByteOrder.LITTLE_ENDIAN);
+            int catCount = bb.getInt();
+            Log.d("Main", "Categories: " + catCount);
+
+            //next 32 bytes is the heading
+            start = end;
+            end += 32;
+            intBytes = Arrays.copyOfRange(buff, start, end);
+            cat = new String(intBytes).replaceAll("\u0000.*", "");
+
+            //next 4 bytes is the amount
+            start = end;
+            end += 4;
+            intBytes = Arrays.copyOfRange(buff, start, end);
+            bb = ByteBuffer.wrap(intBytes);
+            bb = bb.order(ByteOrder.LITTLE_ENDIAN);
+            float amount = bb.getFloat();
+
+            JCategory category = new JCategory(cat, amount);
+            Log.d("Main", cat + amount);
+
+            for(int k = 0; k < catCount; k++)
+            {
+                //next 32 bytes is the sub-category name
+                start = end;
+                end += 32;
+                intBytes = Arrays.copyOfRange(buff, start, end);
+                cat = new String(intBytes).replaceAll("\u0000.*", "");
+
+                //next 4 bytes is the amount
+                start = end;
+                end += 4;
+                intBytes = Arrays.copyOfRange(buff, start, end);
+                bb = ByteBuffer.wrap(intBytes);
+                bb = bb.order(ByteOrder.LITTLE_ENDIAN);
+                float subAmount = bb.getFloat();
+
+                category.subCategories.add(new JCategory(cat, subAmount));
+
+                Log.d("Main", " - " + cat + subAmount);
+            }
+
+            categories.add(category);
+
+        }
+
+    }
+
     public String save() {
 
         Log.d("Main", "Saved budget");

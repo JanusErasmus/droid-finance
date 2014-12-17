@@ -30,14 +30,14 @@ public class JTransArrayAdapter extends ArrayAdapter {
         View rowView = inflater.inflate(R.layout.trans_list_item, parent, false);
 
         TextView textView = (TextView) rowView.findViewById(R.id.category);
-        textView.setText(values.get(position).getCategory());
+        textView.setText(values.get(position).category);
 
         textView = (TextView) rowView.findViewById(R.id.description);
-        textView.setText(values.get(position).getDescription());
+        textView.setText(values.get(position).description);
 
         textView = (TextView) rowView.findViewById(R.id.amount);
         NumberFormat formatter = NumberFormat.getCurrencyInstance();
-        String amountString = formatter.format(values.get(position).getAmount());
+        String amountString = formatter.format(values.get(position).amount);
         textView.setText(amountString);
 
         return rowView;

@@ -8,50 +8,27 @@ import android.util.Log;
  */
 public class JTransaction {
 
-    private String mCategory;
-    private String mDescription;
-    private double mAmount;
+    public String category;
+    public String description;
+    public double amount;
 
 
     public JTransaction()  {
-        mCategory = "";
-        mDescription = "";
-        mAmount = 0;
+        category = "";
+        description = "";
+        amount = 0;
     }
 
-    public JTransaction(String category, String Description, double amount) {
-        mDescription = Description;
-        mCategory = category;
-        mAmount = amount;
+    public JTransaction(String category, String description, double amount) {
+        this.description = description;
+        this.category = category;
+        this.amount = amount;
     }
 
     public void Log() {
-       Log.d("Main", "Desc: " + mDescription);
-        Log.d("Main", "Cat: " + mCategory);
-        Log.d("Main", "Amnt: " + String.valueOf( mAmount ));
+        Log.d("Main", "Desc: " + description);
+        Log.d("Main", "Cat: " + category);
+        Log.d("Main", "Amnt: " + String.valueOf( amount ));
     }
 
-    public String getDescription() {
-        return mDescription;
-    }
-
-    public void setDescription(String mDescription) {
-        this.mDescription = mDescription;
-    }
-
-    public double getAmount() {
-        return mAmount;
-    }
-
-    public void setAmount(double mAmount) {
-        this.mAmount = mAmount;
-    }
-
-    public String getCategory() {
-        return mCategory;
-    }
-
-    public void setCategory(String mCategory) {
-        this.mCategory = mCategory;
-    }
 }

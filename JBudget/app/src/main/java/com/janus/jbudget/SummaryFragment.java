@@ -51,7 +51,7 @@ public class SummaryFragment extends Fragment {
         super.onResume();
 
         TextView name = (TextView) getView().findViewById(R.id.budget_name);
-        String nameString = JBudget.get().getName();
+        String nameString = JBudget.get().name;
 
         if( nameString.lastIndexOf('.') > 0)
             nameString = nameString.substring(0, nameString.lastIndexOf('.'));
