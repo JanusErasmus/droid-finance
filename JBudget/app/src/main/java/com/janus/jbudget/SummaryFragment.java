@@ -7,6 +7,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ExpandableListAdapter;
+import android.widget.ExpandableListView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.janus.jbudget.R;
@@ -17,6 +23,8 @@ public class SummaryFragment extends Fragment {
      * fragment.
      */
     private static final String ARG_SECTION_NUMBER = "section_number";
+
+    JCategoryListAdapter mAdapter;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -31,6 +39,7 @@ public class SummaryFragment extends Fragment {
     }
     public SummaryFragment()
     {
+        mAdapter = null;
     }
 
     @Override
@@ -56,7 +65,17 @@ public class SummaryFragment extends Fragment {
         if( nameString.lastIndexOf('.') > 0)
             nameString = nameString.substring(0, nameString.lastIndexOf('.'));
 
+        ExpandableListView listView = (ExpandableListView) getView().findViewById(R.id.expCategory);
+
         name.setText(nameString);
 
+        if(mAdapter == null){
+
+            mAdapter = new JCategoryListAdapter(
+                    getActivity(),
+                    JBudget.get().categories);
+
+            listView.setAdapter(mAdapter);
+        }
     }
 }

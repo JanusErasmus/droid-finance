@@ -17,5 +17,11 @@
             android:text="Large Text"
             android:id="@+id/budget_name"
             android:layout_gravity="center_horizontal" />
+
+        <ExpandableListView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:groupIndicator="@null"
+            android:id="@+id/expCategory" />
     </LinearLayout>
 </FrameLayout>

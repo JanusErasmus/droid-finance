@@ -21,6 +21,8 @@ public class TransactionFragment extends Fragment {
      */
     private static final String ARG_SECTION_NUMBER = "section_number";
 
+    private JTransArrayAdapter mAdapter;
+
     /**
      * Returns a new instance of this fragment for the given section
      * number.
@@ -34,13 +36,16 @@ public class TransactionFragment extends Fragment {
     }
     public TransactionFragment()
     {
+        mAdapter = null;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_transaction, container, false);
+        View view = inflater.inflate(R.layout.fragment_transaction, container, false);
+
+        return view;
     }
 
     @Override
@@ -58,14 +63,18 @@ public class TransactionFragment extends Fragment {
     {
         super.onResume();
 
-        JTransArrayAdapter adapter = new JTransArrayAdapter(
-                getActivity(),
-                JBudget.get().transactionList
-        );
-
-
         ListView list = (ListView) getView().findViewById(R.id.trans_list);
-        list.setAdapter(adapter);
+
+        if(mAdapter == null) {
+
+            mAdapter = new JTransArrayAdapter(
+                    getActivity(),
+                    JBudget.get().transactionList
+            );
+            list.setAdapter(mAdapter);
+
+        }
+
         list.setSelection(list.getAdapter().getCount()-1);
 
     }

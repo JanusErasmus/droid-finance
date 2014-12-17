@@ -43,16 +43,15 @@ public class JBudget {
     }
 
     private JBudget() {
-
-        transactionList = new ArrayList<JTransaction>();
-        categories = new ArrayList<JCategory>();
-
         name = "Empty Budget";
         mVersion = -1;
     }
 
     public boolean open(String fileName) {
-        Log.d("Main", "Opening budget " + fileName);
+        //Log.d("Main", "Opening budget " + fileName);
+
+        transactionList = new ArrayList<JTransaction>();
+        categories = new ArrayList<JCategory>();
 
         mFileName = fileName;
 
@@ -104,28 +103,28 @@ public class JBudget {
         ByteBuffer bb = ByteBuffer.wrap(intBytes);
         bb = bb.order(ByteOrder.LITTLE_ENDIAN);
         mVersion = bb.getInt();
-        Log.d("Main", "Populate budget version: " + String.valueOf(mVersion));
+        //Log.d("Main", "Populate budget version: " + String.valueOf(mVersion));
 
         //next 4 bytes is income value
         intBytes = Arrays.copyOfRange(buff, 4, 8);
         bb = ByteBuffer.wrap(intBytes);
         bb = bb.order(ByteOrder.LITTLE_ENDIAN);
         mIncome = bb.getFloat();
-        Log.d("Main", "Income: " + mIncome);
+        //Log.d("Main", "Income: " + mIncome);
 
         //next 4 bytes is bank value
         intBytes = Arrays.copyOfRange(buff, 8, 12);
         bb = ByteBuffer.wrap(intBytes);
         bb = bb.order(ByteOrder.LITTLE_ENDIAN);
         mBank = bb.getFloat();
-        Log.d("Main", "Bank: " + mBank);
+        //Log.d("Main", "Bank: " + mBank);
 
         //next 4 bytes is the length of the transactions
         intBytes = Arrays.copyOfRange(buff, 12, 16);
         bb = ByteBuffer.wrap(intBytes);
         bb = bb.order(ByteOrder.LITTLE_ENDIAN);
         int transCount = bb.getInt();
-        Log.d("Main", "Transactions: " + transCount);
+        //Log.d("Main", "Transactions: " + transCount);
 
         //now read all the transactions from this block of memory
         /**A transaction in version 1 has
@@ -226,7 +225,7 @@ public class JBudget {
             bb = ByteBuffer.wrap(intBytes);
             bb = bb.order(ByteOrder.LITTLE_ENDIAN);
             int catCount = bb.getInt();
-            Log.d("Main", "Categories: " + catCount);
+            //Log.d("Main", "Categories: " + catCount);
 
             //next 32 bytes is the heading
             start = end;
@@ -243,7 +242,7 @@ public class JBudget {
             float amount = bb.getFloat();
 
             JCategory category = new JCategory(cat, amount);
-            Log.d("Main", cat + amount);
+            //Log.d("Main", cat + amount);
 
             for(int k = 0; k < catCount; k++)
             {
@@ -263,7 +262,7 @@ public class JBudget {
 
                 category.subCategories.add(new JCategory(cat, subAmount));
 
-                Log.d("Main", " - " + cat + subAmount);
+                //Log.d("Main", " - " + cat + subAmount);
             }
 
             categories.add(category);
@@ -278,4 +277,5 @@ public class JBudget {
 
         return mFileName;
     }
+
 }
