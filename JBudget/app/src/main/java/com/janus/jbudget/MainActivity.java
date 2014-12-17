@@ -35,6 +35,15 @@ public class MainActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        String fileName;
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        fileName = sharedPref.getString(getString(R.string.saved_file_name), "");
+
+        JBudget.init();
+
+        if(!fileName.isEmpty())
+            JBudget.get().open(fileName);
+
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
@@ -44,14 +53,6 @@ public class MainActivity extends ActionBarActivity
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
-        String fileName;
-        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-        fileName = sharedPref.getString(getString(R.string.saved_file_name), "");
-
-        JBudget.init();
-
-        if(!fileName.isEmpty())
-            JBudget.get().open(fileName);
     }
 
     @Override

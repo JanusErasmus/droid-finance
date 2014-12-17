@@ -24,8 +24,6 @@ public class SummaryFragment extends Fragment {
      */
     private static final String ARG_SECTION_NUMBER = "section_number";
 
-    JCategoryListAdapter mAdapter;
-
     /**
      * Returns a new instance of this fragment for the given section
      * number.
@@ -37,16 +35,33 @@ public class SummaryFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-    public SummaryFragment()
-    {
-        mAdapter = null;
+    public SummaryFragment(){
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_summary, container, false);
+        View view = inflater.inflate(R.layout.fragment_summary, container, false);
+
+        TextView name = (TextView) view.findViewById(R.id.budget_name);
+        String nameString = JBudget.get().name;
+
+        if( nameString.lastIndexOf('.') > 0)
+            nameString = nameString.substring(0, nameString.lastIndexOf('.'));
+
+        name.setText(nameString);
+
+        ExpandableListView listView = (ExpandableListView) view.findViewById(R.id.expCategory);
+        JCategoryListAdapter mAdapter;
+        mAdapter = new JCategoryListAdapter(
+                getActivity(),
+                JBudget.get().categories
+        );
+        listView.setAdapter(mAdapter);
+
+        return view;
     }
 
     @Override
@@ -54,28 +69,5 @@ public class SummaryFragment extends Fragment {
         super.onAttach(activity);
         //this is part of index 0 in the MainActivity, let MainActivity know this was attached
         ((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
-    }
-
-    public void onResume() {
-        super.onResume();
-
-        TextView name = (TextView) getView().findViewById(R.id.budget_name);
-        String nameString = JBudget.get().name;
-
-        if( nameString.lastIndexOf('.') > 0)
-            nameString = nameString.substring(0, nameString.lastIndexOf('.'));
-
-        ExpandableListView listView = (ExpandableListView) getView().findViewById(R.id.expCategory);
-
-        name.setText(nameString);
-
-        if(mAdapter == null){
-
-            mAdapter = new JCategoryListAdapter(
-                    getActivity(),
-                    JBudget.get().categories);
-
-            listView.setAdapter(mAdapter);
-        }
     }
 }

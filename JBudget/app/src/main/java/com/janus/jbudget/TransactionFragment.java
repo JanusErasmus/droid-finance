@@ -21,8 +21,6 @@ public class TransactionFragment extends Fragment {
      */
     private static final String ARG_SECTION_NUMBER = "section_number";
 
-    private JTransArrayAdapter mAdapter;
-
     /**
      * Returns a new instance of this fragment for the given section
      * number.
@@ -34,9 +32,9 @@ public class TransactionFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-    public TransactionFragment()
-    {
-        mAdapter = null;
+
+    public TransactionFragment() {
+
     }
 
     @Override
@@ -45,6 +43,14 @@ public class TransactionFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_transaction, container, false);
 
+        ListView list = (ListView) view.findViewById(R.id.trans_list);
+
+        JTransArrayAdapter adapter;
+        adapter = new JTransArrayAdapter(
+                getActivity(),
+                JBudget.get().transactionList
+        );
+        list.setAdapter(adapter);
         return view;
     }
 
@@ -58,24 +64,21 @@ public class TransactionFragment extends Fragment {
 
     }
 
-
+static int count = -1;
     public void onResume()
     {
         super.onResume();
 
-        ListView list = (ListView) getView().findViewById(R.id.trans_list);
+        try {
+            ListView list = (ListView) getView().findViewById(R.id.trans_list);
 
-        if(mAdapter == null) {
+            if(list != null)
+                list.setSelection(list.getAdapter().getCount()-1);
 
-            mAdapter = new JTransArrayAdapter(
-                    getActivity(),
-                    JBudget.get().transactionList
-            );
-            list.setAdapter(mAdapter);
-
+        }catch(NullPointerException e) {
         }
 
-        list.setSelection(list.getAdapter().getCount()-1);
-
+        JBudget.get().categories.get(0).amount = count--;
+        JBudget.get().categories.get(1).subCategories.get(1).amount = count;
     }
 }

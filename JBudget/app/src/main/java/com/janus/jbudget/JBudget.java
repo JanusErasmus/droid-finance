@@ -43,6 +43,10 @@ public class JBudget {
     }
 
     private JBudget() {
+
+        transactionList = new ArrayList<JTransaction>();
+        categories = new ArrayList<JCategory>();
+
         name = "Empty Budget";
         mVersion = -1;
     }
