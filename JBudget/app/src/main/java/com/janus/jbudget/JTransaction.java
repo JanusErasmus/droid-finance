@@ -1,6 +1,8 @@
 package com.janus.jbudget;
 
 
+import android.util.Log;
+
 /**
  * Created by Janus on 2014-12-15.
  */
@@ -21,6 +23,12 @@ public class JTransaction {
         mDescription = Description;
         mCategory = category;
         mAmount = amount;
+    }
+
+    public void Log() {
+       Log.d("Main", "Desc: " + mDescription);
+        Log.d("Main", "Cat: " + mCategory);
+        Log.d("Main", "Amnt: " + String.valueOf( mAmount ));
     }
 
     public String getDescription() {
