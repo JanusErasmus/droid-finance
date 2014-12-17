@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/fragment_container"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+<!--<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--android:id="@+id/fragment_container"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent" >-->
 
-    <LinearLayout
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -13,10 +13,9 @@
 
         <ListView
             android:layout_width="match_parent"
-            android:layout_height="499dp"
+            android:layout_height="522dp"
             android:id="@+id/trans_list"
-            android:layout_gravity="top"
-            android:layout_weight="0.80" />
+            android:layout_gravity="top" />
 
         <Button
             style="?android:attr/buttonStyleSmall"
@@ -29,4 +28,4 @@
 
 
 
-</FrameLayout>
+<!--</FrameLayout>-->

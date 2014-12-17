@@ -7,12 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class TransactionFragment extends Fragment {
     /**
@@ -69,14 +64,16 @@ static int count = -1;
     {
         super.onResume();
 
+        ListView list = null;
+
         try {
-            ListView list = (ListView) getView().findViewById(R.id.trans_list);
-
-            if(list != null)
-                list.setSelection(list.getAdapter().getCount()-1);
-
+            list = (ListView) getView().findViewById(R.id.trans_list);
         }catch(NullPointerException e) {
+            Log.d("Main", "Null getting trans_list");
         }
+
+        if(list != null)
+            list.setSelection(list.getAdapter().getCount()-1);
 
         JBudget.get().categories.get(0).amount = count--;
         JBudget.get().categories.get(1).subCategories.get(1).amount = count;

@@ -1,17 +1,12 @@
 package com.janus.jbudget;
 
 import android.app.Activity;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.CheckedTextView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.NumberFormat;
 import java.util.List;
@@ -46,7 +41,7 @@ public class JCategoryListAdapter extends BaseExpandableListAdapter {
       JCategory cat = (JCategory)getChild(groupPosition, childPosition);
 
       String children = cat.heading;
-      convertView = inflater.inflate(R.layout.cat_child_item, null);
+      convertView = inflater.inflate(R.layout.cat_child_item, parent, false);
       TextView text = (TextView) convertView.findViewById(R.id.heading);
       text.setText(children);
 
@@ -89,7 +84,7 @@ public class JCategoryListAdapter extends BaseExpandableListAdapter {
   public View getGroupView(int groupPosition, boolean isExpanded,
       View convertView, ViewGroup parent) {
 
-      convertView = inflater.inflate(R.layout.cat_parent_item, null);
+      convertView = inflater.inflate(R.layout.cat_parent_item, parent, false);
 
       JCategory category = (JCategory) getGroup(groupPosition);
 

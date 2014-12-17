@@ -12,6 +12,7 @@ import java.util.List;
 
 /**
  * Created by Janus on 2014-12-16.
+ * For JBudget Android App
  */
 public class JTransArrayAdapter extends ArrayAdapter {
     private final Context context;
@@ -25,10 +26,11 @@ public class JTransArrayAdapter extends ArrayAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rowView = inflater.inflate(R.layout.trans_list_item, parent, false);
 
+        View rowView = inflater.inflate(R.layout.trans_list_item, parent, false);
         TextView textView = (TextView) rowView.findViewById(R.id.category);
         textView.setText(values.get(position).category);
 

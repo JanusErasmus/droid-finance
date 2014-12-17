@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -49,7 +48,63 @@ public class FilesFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_files, container, false);
+        View view = inflater.inflate(R.layout.fragment_files, container, false);
+
+        File budgetDirectory = new File(Environment.getExternalStoragePublicDirectory("Documents"), "jFinance");
+        if(budgetDirectory.exists())
+        {
+            Log.d("Main", "Directory exists");
+        }
+        else
+        {
+            if (!budgetDirectory.mkdirs())
+                Log.d("Main", "Directory not created");
+            else
+                Log.d("Main", "Directory created");
+        }
+
+        FilenameFilter textFilter = new FilenameFilter() {
+
+            public boolean accept(File dir, String name) {
+
+                String lowercaseName = name.toLowerCase();
+                return lowercaseName.endsWith(".jbud");
+            }
+        };
+        files = budgetDirectory.listFiles(textFilter);
+
+        List<String> fileNames = new ArrayList<String>();
+        //remove path
+        for(File file : files)//for(int k =0; k < files.length; k++)
+        {
+            fileNames.add(file.getName());
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                getActivity(),
+                android.R.layout.simple_list_item_1,
+                fileNames
+        );
+
+
+        ListView list = (ListView) view.findViewById(R.id.file_list);
+        list.setAdapter(adapter);
+        list.setSelection(list.getAdapter().getCount()-1);
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+
+                //check if file was opened
+                if(JBudget.get().open(files[position].toString()) && (mMainActivity != null))
+                {
+                    mMainActivity.showSummary();
+                }
+            }
+        });
+
+        return view;
     }
 
     @Override
@@ -66,62 +121,7 @@ public class FilesFragment extends Fragment {
     {
         super.onResume();
 
-        File budgetDirectory = new File(Environment.getExternalStoragePublicDirectory("Documents"), "jFinance");
-        if(budgetDirectory.exists())
-        {
-            Log.d("Main", "Directory exists");
-        }
-        else
-        {
-            if (!budgetDirectory.mkdirs())
-                Log.d("Main", "Directory not created");
-            else
-                Log.d("Main", "Directory created");
-        }
 
-        FilenameFilter textFilter = new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                String lowercaseName = name.toLowerCase();
-                if (lowercaseName.endsWith(".jbud")) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        };
-        files = budgetDirectory.listFiles(textFilter);
-
-        List<String> fileNames = new ArrayList<String>();
-        //remove path
-        for(File file : files)//for(int k =0; k < files.length; k++)
-        {
-            fileNames.add(file.getName());
-        }
-
-        ArrayAdapter adapter = new ArrayAdapter(
-                getActivity(),
-                android.R.layout.simple_list_item_1,
-                fileNames
-        );
-
-
-        ListView list = (ListView) getView().findViewById(R.id.file_list);
-        list.setAdapter(adapter);
-        list.setSelection(list.getAdapter().getCount()-1);
-
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
-               JBudget.get().open(files[position].toString());
-
-                //check if file was opened
-                if(true && (mMainActivity != null))
-                {
-                    mMainActivity.showSummary();
-                }
-            }
-        });
 
     }
 }

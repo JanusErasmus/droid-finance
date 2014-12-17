@@ -5,6 +5,7 @@ import java.util.List;
 
 /**
  * Created by Janus on 2014-12-17.
+ * For JBudget Android App
  */
 public class JCategory {
 
@@ -16,7 +17,7 @@ public class JCategory {
     {
         this.heading = heading;
         this.amount = amount;
-        subCategories = new ArrayList<JCategory>();
+        subCategories = new ArrayList<>();
     }
 
     public boolean hasSubCategories(){

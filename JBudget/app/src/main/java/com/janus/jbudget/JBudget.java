@@ -8,16 +8,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.sql.Array;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
  * Created by Janus on 2014-12-16.
+ * For JBudget Android App.
  */
 public class JBudget {
 
@@ -27,6 +26,7 @@ public class JBudget {
     public List<JCategory> categories;
     public String name;
 
+    private boolean mChanged;
     private String mFileName;
     private int mVersion;
     private float mIncome;
@@ -44,8 +44,9 @@ public class JBudget {
 
     private JBudget() {
 
-        transactionList = new ArrayList<JTransaction>();
-        categories = new ArrayList<JCategory>();
+        mChanged = false;
+        transactionList = new ArrayList<>();
+        categories = new ArrayList<>();
 
         name = "Empty Budget";
         mVersion = -1;
@@ -54,8 +55,8 @@ public class JBudget {
     public boolean open(String fileName) {
         //Log.d("Main", "Opening budget " + fileName);
 
-        transactionList = new ArrayList<JTransaction>();
-        categories = new ArrayList<JCategory>();
+        transactionList = new ArrayList<>();
+        categories = new ArrayList<>();
 
         mFileName = fileName;
 
@@ -92,7 +93,11 @@ public class JBudget {
         }
 
         if(len > 0)
+        {
             populateBudget(buffer, len);
+
+            return true;
+        }
 
         return false;
     }
@@ -189,16 +194,14 @@ public class JBudget {
 //        bb = bb.order(ByteOrder.LITTLE_ENDIAN);
 //        int day = bb.getInt();
 
-        String desc = "";
-        String cat = "";
 
         //next 64 bytes is the description
         intBytes = Arrays.copyOfRange(buff, 6, 70);
-        desc = new String(intBytes).replaceAll("\u0000.*", "");
+        String desc = new String(intBytes).replaceAll("\u0000.*", "");
 
         //next 32 bytes is the category
         intBytes = Arrays.copyOfRange(buff, 70, 102);
-        cat =  new String(intBytes).replaceAll("\u0000.*", "");
+        String cat =  new String(intBytes).replaceAll("\u0000.*", "");
 
 
         //next 4 bytes is the amount
@@ -207,8 +210,7 @@ public class JBudget {
         bb = bb.order(ByteOrder.LITTLE_ENDIAN);
         float amount = bb.getFloat();
 
-        JTransaction tr = new JTransaction(desc, cat, amount);
-        return tr;
+        return new JTransaction(desc, cat, amount);
     }
 
     private void fillCategories(byte buff[]) {
@@ -217,7 +219,7 @@ public class JBudget {
         ByteBuffer bb;
         String cat;
 
-        int start = 0;
+        int start;
         int end = 0;
 
         while(end < buff.length) {
@@ -277,7 +279,10 @@ public class JBudget {
 
     public String save() {
 
-        Log.d("Main", "Saved budget");
+        if(mChanged) {
+
+            Log.d("Main", "Saved budget");
+        }
 
         return mFileName;
     }
