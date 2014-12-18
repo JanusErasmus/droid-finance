@@ -14,5 +14,6 @@
     <string name="string_trans_desc">Description</string>
     <string name="string_trans_amount">R 0 .00</string>
     <string name="saved_file_name">com.janus.jbudget.file_name</string>
+    <string name="title_activity_add_transaction">Add Transaction</string>
 
 </resources>
