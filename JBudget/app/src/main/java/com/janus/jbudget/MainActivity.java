@@ -42,8 +42,6 @@ public class MainActivity extends ActionBarActivity
 
         if(!fileName.isEmpty()) {
             JBudget.get().open(fileName);
-
-            JBudget.get().budgetChanged();
         }
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
@@ -75,7 +73,13 @@ public class MainActivity extends ActionBarActivity
                         .commit();
             }
             break;
-            case 2:
+            case 2: {
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, CategoryFragment.newInstance(position + 1))
+                        .commit();
+            }
+            break;
+            case 3:
             {
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, FilesFragment.newInstance(position + 1))
@@ -100,6 +104,9 @@ public class MainActivity extends ActionBarActivity
                 mTitle = getString(R.string.title_trans);
                 break;
             case 3:
+                mTitle = getString(R.string.title_category);
+                break;
+            case 4:
                 mTitle = getString(R.string.title_files);
                 break;
         }

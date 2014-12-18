@@ -51,11 +51,7 @@ public class FilesFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_files, container, false);
 
         File budgetDirectory = new File(Environment.getExternalStoragePublicDirectory("Documents"), "jFinance");
-        if(budgetDirectory.exists())
-        {
-            Log.d("Main", "Directory exists");
-        }
-        else
+        if(!budgetDirectory.exists())
         {
             if (!budgetDirectory.mkdirs())
                 Log.d("Main", "Directory not created");

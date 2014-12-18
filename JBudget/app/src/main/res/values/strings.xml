@@ -4,6 +4,7 @@
     <string name="app_name">JBudget</string>
     <string name="title_summary">Summary</string>
     <string name="title_trans">Transactions</string>
+    <string name="title_category">Categories</string>
     <string name="title_files">Files</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

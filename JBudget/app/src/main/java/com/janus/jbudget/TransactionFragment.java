@@ -74,8 +74,5 @@ static int count = -1;
 
         if(list != null)
             list.setSelection(list.getAdapter().getCount()-1);
-
-        JBudget.get().categories.get(0).amount = count--;
-        JBudget.get().categories.get(1).subCategories.get(1).amount = count;
     }
 }

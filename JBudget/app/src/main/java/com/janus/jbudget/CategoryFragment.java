@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 
-public class SummaryFragment extends Fragment {
+public class CategoryFragment extends Fragment {
     /**
      * The fragment argument representing the section number for this
      * fragment.
@@ -20,14 +20,14 @@ public class SummaryFragment extends Fragment {
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static SummaryFragment newInstance(int sectionNumber) {
-        SummaryFragment fragment = new SummaryFragment();
+    public static CategoryFragment newInstance(int sectionNumber) {
+        CategoryFragment fragment = new CategoryFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_SECTION_NUMBER, sectionNumber);
         fragment.setArguments(args);
         return fragment;
     }
-    public SummaryFragment(){
+    public CategoryFragment(){
 
     }
 
@@ -35,7 +35,7 @@ public class SummaryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_summary, container, false);
+        View view = inflater.inflate(R.layout.fragment_categories, container, false);
 
         TextView name = (TextView) view.findViewById(R.id.budget_name);
         String nameString = JBudget.get().name;
@@ -49,7 +49,7 @@ public class SummaryFragment extends Fragment {
         JCategoryListAdapter mAdapter;
         mAdapter = new JCategoryListAdapter(
                 getActivity(),
-                JBudget.get().categoryBalance
+                JBudget.get().categories
         );
         listView.setAdapter(mAdapter);
 

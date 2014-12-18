@@ -27,6 +27,8 @@ public class JBudget {
 
     public List<JTransaction> transactionList;
     public List<JCategory> categories;
+	public List<JCategory> categoryBalance;
+	
     public String name;
 
     private boolean mChanged;
@@ -57,6 +59,7 @@ public class JBudget {
 
     public void budgetChanged() {
         mChanged = true;
+		calculateBalance();
     }
 
     public boolean open(String fileName) {
@@ -102,7 +105,7 @@ public class JBudget {
         if(len > 0)
         {
             populateBudget(buffer, len);
-
+			calculateBalance();
             return true;
         }
 
@@ -484,5 +487,62 @@ public class JBudget {
     		Log.d("Main", "File not found" + e.toString());
     	}
     }
+
+	/** Fills the categoryBalance list
+	 * 
+	 */
+	private void calculateBalance() {
+
+		categoryBalance = new ArrayList<>();
+
+		for(JCategory cat : categories)
+		{			
+			JCategory parent;
+			
+			if(cat.hasSubCategories())
+			{    			
+				parent = new JCategory(cat.heading, 0);
+				
+				for(JCategory subCat : cat.subCategories)
+				{
+					parent.subCategories.add(new JCategory(subCat.heading, getBalance(cat, subCat)));
+				}
+			}
+			else
+			{
+				parent = new JCategory(cat.heading, getBalance(cat));
+			}
+
+			categoryBalance.add(parent);
+		}		
+	}
+
+	private float getBalance(JCategory parent) {
+
+		float balance = parent.amount;
+
+		for(JTransaction trans : transactionList) 
+		{    		
+			if(trans.category.equals(parent.heading))
+			{
+				balance -= trans.amount;
+			}
+		}
+
+		return balance;
+	}    
+
+	private float getBalance(JCategory parent, JCategory child) {
+
+		float balance = child.amount;
+
+		for(JTransaction trans : transactionList) 
+		{
+			if((trans.category.equals(parent.heading)) && (trans.description.equals(child.heading)))
+				balance -= trans.amount;
+		}
+
+		return balance;
+	}    
 
 }
