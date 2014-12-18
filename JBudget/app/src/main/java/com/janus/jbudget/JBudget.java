@@ -3,11 +3,14 @@ package com.janus.jbudget;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteOrder;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -50,6 +53,10 @@ public class JBudget {
 
         name = "Empty Budget";
         mVersion = -1;
+    }
+
+    public void budgetChanged() {
+        mChanged = true;
     }
 
     public boolean open(String fileName) {
@@ -197,11 +204,11 @@ public class JBudget {
 
         //next 64 bytes is the description
         intBytes = Arrays.copyOfRange(buff, 6, 70);
-        String desc = new String(intBytes).replaceAll("\u0000.*", "");
+        String desc = getHeading(intBytes);
 
         //next 32 bytes is the category
         intBytes = Arrays.copyOfRange(buff, 70, 102);
-        String cat =  new String(intBytes).replaceAll("\u0000.*", "");
+        String cat =  getHeading(intBytes);
 
 
         //next 4 bytes is the amount
@@ -237,7 +244,7 @@ public class JBudget {
             start = end;
             end += 32;
             intBytes = Arrays.copyOfRange(buff, start, end);
-            cat = new String(intBytes).replaceAll("\u0000.*", "");
+            cat = getHeading(intBytes);
 
             //next 4 bytes is the amount
             start = end;
@@ -256,7 +263,7 @@ public class JBudget {
                 start = end;
                 end += 32;
                 intBytes = Arrays.copyOfRange(buff, start, end);
-                cat = new String(intBytes).replaceAll("\u0000.*", "");
+                cat = getHeading(intBytes);
 
                 //next 4 bytes is the amount
                 start = end;
@@ -276,15 +283,206 @@ public class JBudget {
         }
 
     }
+	
+	private String getHeading(byte buff[])
+    {
+    	String heading = new String(buff);
+    	int idx = heading.indexOf('\u0000');    	
+    	return heading.substring(0, idx);
+    }
 
     public String save() {
 
         if(mChanged) {
+            mChanged = false;
 
-            Log.d("Main", "Saved budget");
+            if(writeBudget(mFileName)) {
+                Log.d("Main", "Saved budget");
+
+                return mFileName;
+            }
         }
 
-        return mFileName;
+        return null;
+    }
+	
+	private boolean writeBudget(String fileName) {
+
+    	File budget = new File(fileName);
+
+    	OutputStream out = null;
+    	try {
+    		out = new BufferedOutputStream(new FileOutputStream(budget));
+
+    	} catch (FileNotFoundException e) {
+            Log.d("Main", "File not found" + e.toString());
+    	}
+
+    	if(out == null)
+    		return false;
+
+    	byte intBytes[];
+    	ByteBuffer bb;
+
+    	//first 4 bytes is the version
+    	bb = ByteBuffer.allocate(4);
+    	bb.order(ByteOrder.LITTLE_ENDIAN); 
+    	bb.putInt(mVersion);
+    	intBytes = bb.array();
+    	write(out, intBytes);
+
+    	//next 4 bytes is income value
+    	bb = ByteBuffer.allocate(4);
+    	bb.order(ByteOrder.LITTLE_ENDIAN); 
+    	bb.putFloat(mIncome);
+    	intBytes = bb.array();
+    	write(out, intBytes);
+
+    	//next 4 bytes is bank value
+    	bb = ByteBuffer.allocate(4);
+    	bb.order(ByteOrder.LITTLE_ENDIAN); 
+    	bb.putFloat(mBank);
+    	intBytes = bb.array();
+    	write(out, intBytes);
+
+    	writeTransactions(out);
+    	writeCategories(out);
+
+    	try {
+    		out.close();
+    	} catch (IOException e) {
+            Log.d("Main", "File not closed" + e.toString());
+    	}
+
+    	return true;
+    }
+
+    private void writeTransactions(OutputStream out) {
+
+    	ByteBuffer bb;
+    	byte bytes[];
+
+    	//next 4 bytes is the length of the transactions
+    	bb = ByteBuffer.allocate(4);
+    	bb.order(ByteOrder.LITTLE_ENDIAN); 
+    	bb.putInt(transactionList.size());
+    	bytes = bb.array();
+    	write(out, bytes);
+
+
+    	for(JTransaction trans : transactionList)
+    	{
+    		bytes = getTransaction(trans);
+    		write(out, bytes);
+    	}
+    }
+
+    private byte[] getTransaction(JTransaction trans) {
+
+    	byte bytes[] = new byte[106];
+    	ByteBuffer bb;
+
+    	//first 2 bytes is the year
+    	bb = ByteBuffer.allocate(4);
+    	bb.order(ByteOrder.LITTLE_ENDIAN); 
+    	bb.putInt(2014);
+    	System.arraycopy(bb.array(), 0, bytes, 0, 2);
+
+    	//next 2 bytes is the month
+    	bb = ByteBuffer.allocate(4);
+    	bb.order(ByteOrder.LITTLE_ENDIAN); 
+    	bb.putInt(4);
+    	System.arraycopy(bb.array(), 0, bytes, 2, 2);
+
+    	//next 2 bytes is the day
+    	bb = ByteBuffer.allocate(4);
+    	bb.order(ByteOrder.LITTLE_ENDIAN); 
+    	bb.putInt(14);
+    	System.arraycopy(bb.array(), 0, bytes, 4, 2);
+
+
+    	//next 64 bytes is the description
+    	byte stringBytes[] = new byte[64];
+    	System.arraycopy(trans.description.getBytes(), 0, stringBytes, 0, trans.description.length());
+    	System.arraycopy(stringBytes, 0, bytes, 6, 64);
+
+    	//next 32 bytes is the category
+    	stringBytes = new byte[32];
+    	System.arraycopy(trans.category.getBytes(), 0, stringBytes, 0, trans.category.length());
+    	System.arraycopy(stringBytes, 0, bytes, 70, 32);
+
+
+    	//next 4 bytes is the amount
+    	bb = ByteBuffer.allocate(4);
+    	bb.order(ByteOrder.LITTLE_ENDIAN); 
+    	bb.putFloat(trans.amount);
+    	System.arraycopy(bb.array(), 0, bytes, 102, 4);
+
+
+    	return bytes;
+    }
+
+    private void writeCategories(OutputStream out) {
+
+    	byte intBytes[];
+    	ByteBuffer bb;
+
+    	for(JCategory cat : categories)
+    	{
+    		//first 4 bytes is the amount of categories in the list
+    		bb = ByteBuffer.allocate(4);
+    		bb.order(ByteOrder.LITTLE_ENDIAN); 
+    		bb.putInt(cat.subCategories.size());
+    		intBytes = bb.array();
+    		write(out, intBytes);
+
+    		//next 32 bytes is the heading
+    		intBytes = cat.heading.getBytes();
+    		bb = ByteBuffer.allocate(32);
+    		bb.put(intBytes, 0, intBytes.length);
+    		intBytes = bb.array();
+    		write(out, intBytes);		
+
+    		//next 4 bytes is the amount
+    		bb = ByteBuffer.allocate(4);
+    		bb.order(ByteOrder.LITTLE_ENDIAN); 
+    		bb.putFloat(cat.amount);
+    		intBytes = bb.array();
+    		write(out, intBytes);
+
+    		if(cat.hasSubCategories())
+    		{
+    			for(JCategory subCat : cat.subCategories)
+    			{
+    				//next 32 bytes is the heading
+    				intBytes = subCat.heading.getBytes();
+    				bb = ByteBuffer.allocate(32);
+    				bb.put(intBytes, 0, intBytes.length);
+    				intBytes = bb.array();
+    				write(out, intBytes);		
+
+    				//next 4 bytes is the amount
+    				bb = ByteBuffer.allocate(4);
+    				bb.order(ByteOrder.LITTLE_ENDIAN); 
+    				bb.putFloat(subCat.amount);
+    				intBytes = bb.array();
+    				write(out, intBytes);
+    			}
+    		}
+    	}
+
+    }
+
+    private void write(OutputStream out, byte buff[]) {
+
+    	if(out == null)
+    		return;
+
+    	try {
+    		out.write(buff);
+    	} catch (IOException e) {
+    		Log.d("Main", "File not found" + e.toString());
+    	}
     }
 
 }

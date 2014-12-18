@@ -40,8 +40,11 @@ public class MainActivity extends ActionBarActivity
 
         JBudget.init();
 
-        if(!fileName.isEmpty())
+        if(!fileName.isEmpty()) {
             JBudget.get().open(fileName);
+
+            JBudget.get().budgetChanged();
+        }
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -154,10 +157,13 @@ public class MainActivity extends ActionBarActivity
         //save the budget
         String fileName = JBudget.get().save();
 
-        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(getString(R.string.saved_file_name), fileName);
-        editor.commit();
+        if(fileName != null) {
+
+            SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString(getString(R.string.saved_file_name), fileName);
+            editor.commit();
+        }
 
         super.onStop();
     }

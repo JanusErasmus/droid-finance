@@ -10,7 +10,7 @@ public class JTransaction {
 
     public String category;
     public String description;
-    public double amount;
+    public float amount;
 
 
     public JTransaction()  {
@@ -19,7 +19,7 @@ public class JTransaction {
         amount = 0;
     }
 
-    public JTransaction(String category, String description, double amount) {
+    public JTransaction(String description, String category, float amount) {
         this.description = description;
         this.category = category;
         this.amount = amount;
