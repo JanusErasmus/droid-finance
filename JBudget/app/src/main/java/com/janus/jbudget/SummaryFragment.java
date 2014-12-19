@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ public class SummaryFragment extends Fragment {
      */
     private static final String ARG_SECTION_NUMBER = "section_number";
 
+    private JCategoryListAdapter mAdapter;
     /**
      * Returns a new instance of this fragment for the given section
      * number.
@@ -28,8 +30,9 @@ public class SummaryFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-    public SummaryFragment(){
 
+    public SummaryFragment() {
+        mAdapter = null;
     }
 
     @Override
@@ -47,7 +50,7 @@ public class SummaryFragment extends Fragment {
         name.setText(nameString);
 
         ExpandableListView listView = (ExpandableListView) view.findViewById(R.id.expCategory);
-        JCategoryListAdapter mAdapter;
+
         mAdapter = new JCategoryListAdapter(
                 getActivity(),
                 JBudget.get().categoryBalance
@@ -62,5 +65,13 @@ public class SummaryFragment extends Fragment {
         super.onAttach(activity);
         //this is part of index 0 in the MainActivity, let MainActivity know this was attached
         ((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
+    }
+
+    public void onResume() {
+        super.onResume();
+
+        if(mAdapter != null) {
+            mAdapter.notifyDataSetChanged();
+        }
     }
 }

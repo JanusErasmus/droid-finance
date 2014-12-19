@@ -3,6 +3,7 @@ package com.janus.jbudget;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseIntArray;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class AddTransactionActivity extends ActionBarActivity {
+public class AddTransactionActivity extends  ActionBarActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,11 +23,10 @@ public class AddTransactionActivity extends ActionBarActivity {
         setContentView(R.layout.activity_add_transaction);
 
         List<String> list = new ArrayList<>();
-        list.add("Android");
-        list.add("Java");
-        list.add("Spinner Data");
-        list.add("Spinner Adapter");
-        list.add("Spinner Example");
+        for(JCategory cat : JBudget.get().categories)
+        {
+            list.add(cat.heading);
+        }
 
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<>
                 (this, android.R.layout.simple_spinner_item,list);
@@ -36,6 +36,48 @@ public class AddTransactionActivity extends ActionBarActivity {
 
         Spinner spin = (Spinner) findViewById(R.id.cat_spinner);
         spin.setAdapter(dataAdapter);
+        spin.setOnItemSelectedListener(new OnCategorySelectListener(this));
+
+        //ensure the first in the list is selected
+        spin.setSelection(0);
+        categorySelectionChangeCallback(0);
+
+    }
+
+    private void fillSubCategorySpinner(Spinner desc, int idx){
+
+        List<String> subCatList = new ArrayList<>();
+        for(JCategory subCat : JBudget.get().categories.get(idx).subCategories)
+        {
+            subCatList.add(subCat.heading);
+        }
+
+        ArrayAdapter<String> subCatAdapter = new ArrayAdapter<>
+                (this, android.R.layout.simple_spinner_item,subCatList);
+
+        subCatAdapter.setDropDownViewResource
+                (android.R.layout.simple_spinner_dropdown_item);
+
+        desc.setAdapter(subCatAdapter);
+    }
+
+    public void categorySelectionChangeCallback(int idx) {
+
+        EditText descEdit = (EditText) findViewById(R.id.desc_edit);
+        Spinner descSpinner = (Spinner) findViewById(R.id.desc_spinner);
+
+        if(JBudget.get().categories.get(idx).hasSubCategories())
+        {
+
+            fillSubCategorySpinner(descSpinner, idx);
+            descSpinner.setVisibility(View.VISIBLE);
+            descEdit.setVisibility(View.GONE);
+        }
+        else
+        {
+            descSpinner.setVisibility(View.GONE);
+            descEdit.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -53,16 +95,43 @@ public class AddTransactionActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+
     public void AddTransaction(View view) {
 
         if(view == null)
             return;
 
-        EditText txt = (EditText) findViewById(R.id.desc_edit);
-        String desc = txt.getText().toString();
-        txt = (EditText) findViewById(R.id.amount_edit);
-        float amount = Float.valueOf(txt.getText().toString());
+        Spinner catSpinner = (Spinner) findViewById(R.id.cat_spinner);
+        int catIdx = catSpinner.getSelectedItemPosition();
+        String cat = JBudget.get().categories.get(catIdx).heading;
 
-        Log.d("Main", "Add " + desc + " " + amount);
+        String desc;
+        EditText txt = (EditText) findViewById(R.id.desc_edit);
+
+        if(txt.getVisibility() == View.VISIBLE)
+        {
+            desc = txt.getText().toString();
+        }
+        else
+        {
+            Spinner descSpinner = (Spinner) findViewById(R.id.desc_spinner);
+            int descIdx = descSpinner.getSelectedItemPosition();
+            desc = JBudget.get().categories.get(catIdx).subCategories.get(descIdx).heading;
+        }
+
+
+        txt = (EditText) findViewById(R.id.amount_edit);
+        float amount = 0;
+        String amountString = txt.getText().toString();
+        if(!amountString.isEmpty())
+            amount = Float.valueOf(amountString);
+
+        //Log.d("Main", "Add " + cat + desc + " " + amount);
+
+        JBudget.get().transactionList.add(new JTransaction(desc, cat, amount));
+        JBudget.get().budgetChanged();
+
+        finish();
     }
 }

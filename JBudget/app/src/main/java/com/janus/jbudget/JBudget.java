@@ -52,6 +52,7 @@ public class JBudget {
         mChanged = false;
         transactionList = new ArrayList<>();
         categories = new ArrayList<>();
+        categoryBalance = new ArrayList<>();
 
         name = "Empty Budget";
         mVersion = -1;
@@ -493,7 +494,8 @@ public class JBudget {
 	 */
 	private void calculateBalance() {
 
-		categoryBalance = new ArrayList<>();
+        categoryBalance.clear();
+
 
 		for(JCategory cat : categories)
 		{			
