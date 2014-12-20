@@ -1,9 +1,8 @@
 package com.janus.jbudget;
 
-import android.support.v7.app.ActionBarActivity;
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.SparseIntArray;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -14,7 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class AddTransactionActivity extends  ActionBarActivity{
+public class AddTransactionActivity extends Activity {
+
+    private static final String ARG_TRANS_DIALOG_INDEX = "trans_dialog_selected_index";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,10 +39,27 @@ public class AddTransactionActivity extends  ActionBarActivity{
         spin.setAdapter(dataAdapter);
         spin.setOnItemSelectedListener(new OnCategorySelectListener(this));
 
+        int transIdx = 0;
+        Bundle b = getIntent().getExtras();
+        if(!b.isEmpty())
+            transIdx = b.getInt(ARG_TRANS_DIALOG_INDEX);
+
+
+        if(transIdx > 0)
+        {
+            fillActivity(JBudget.get().transactionList.get(transIdx));
+            return;
+        }
+
         //ensure the first in the list is selected
         spin.setSelection(0);
         categorySelectionChangeCallback(0);
 
+
+    }
+
+    private void fillActivity(JTransaction trans) {
+        Log.d("Main", "Trans: " + trans.category + " " + trans.description + " " + trans.amount);
     }
 
     private void fillSubCategorySpinner(Spinner desc, int idx){

@@ -1,12 +1,14 @@
 package com.janus.jbudget;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 public class TransactionFragment extends Fragment {
@@ -15,7 +17,9 @@ public class TransactionFragment extends Fragment {
      * fragment.
      */
     private static final String ARG_SECTION_NUMBER = "section_number";
+    private static final String ARG_TRANS_DIALOG_INDEX = "trans_dialog_selected_index";
 
+    private static JTransArrayAdapter mAdapter;
     /**
      * Returns a new instance of this fragment for the given section
      * number.
@@ -40,12 +44,28 @@ public class TransactionFragment extends Fragment {
 
         ListView list = (ListView) view.findViewById(R.id.trans_list);
 
-        JTransArrayAdapter adapter;
-        adapter = new JTransArrayAdapter(
+        mAdapter = new JTransArrayAdapter(
                 getActivity(),
                 JBudget.get().transactionList
         );
-        list.setAdapter(adapter);
+        list.setAdapter(mAdapter);
+
+        list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+                                           int pos, long id) {
+
+                Bundle args = new Bundle();
+                args.putInt(ARG_TRANS_DIALOG_INDEX, pos);
+
+                TransactionOptionsDialog dialog = new TransactionOptionsDialog();
+                dialog.setArguments(args);
+                dialog.show(getFragmentManager(), "transOptionDialog");
+
+                return true;
+            }
+        });
+
         return view;
     }
 
@@ -59,7 +79,6 @@ public class TransactionFragment extends Fragment {
 
     }
 
-static int count = -1;
     public void onResume()
     {
         super.onResume();
@@ -74,5 +93,13 @@ static int count = -1;
 
         if(list != null)
             list.setSelection(list.getAdapter().getCount()-1);
+    }
+
+    public static void deleteTransction(int idx) {
+        JBudget.get().transactionList.remove(idx);
+        JBudget.get().budgetChanged();
+
+        if(mAdapter != null)
+            mAdapter.notifyDataSetChanged();
     }
 }
