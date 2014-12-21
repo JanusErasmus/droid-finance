@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -16,6 +17,8 @@ import java.util.List;
 public class AddTransactionActivity extends Activity {
 
     private static final String ARG_TRANS_DIALOG_INDEX = "trans_dialog_selected_index";
+
+    private int mEditTransactionIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,15 +42,17 @@ public class AddTransactionActivity extends Activity {
         spin.setAdapter(dataAdapter);
         spin.setOnItemSelectedListener(new OnCategorySelectListener(this));
 
-        int transIdx = 0;
+        mEditTransactionIndex = -1;
         Bundle b = getIntent().getExtras();
-        if(!b.isEmpty())
-            transIdx = b.getInt(ARG_TRANS_DIALOG_INDEX);
+        if(b != null)
+            mEditTransactionIndex = b.getInt(ARG_TRANS_DIALOG_INDEX);
 
 
-        if(transIdx > 0)
+        if(mEditTransactionIndex > 0)
         {
-            fillActivity(JBudget.get().transactionList.get(transIdx));
+            fillActivity(JBudget.get().transactionList.get(mEditTransactionIndex));
+            Button btn = (Button) findViewById(R.id.ok_button);
+            btn.setText("Update");
             return;
         }
 
@@ -59,7 +64,18 @@ public class AddTransactionActivity extends Activity {
     }
 
     private void fillActivity(JTransaction trans) {
-        Log.d("Main", "Trans: " + trans.category + " " + trans.description + " " + trans.amount);
+
+        int idx = JBudget.get().getCategoryIndex(trans.category);
+
+        if(idx < 0)
+            return;
+        Spinner catSpinner = (Spinner) findViewById(R.id.cat_spinner);
+        catSpinner.setSelection(idx);
+
+        EditText amount = (EditText) findViewById(R.id.amount_edit);
+        amount.setText(String.valueOf(trans.amount));
+
+        //Log.d("Main", "Trans: " + trans.category + " " + trans.description + " " + trans.amount);
     }
 
     private void fillSubCategorySpinner(Spinner desc, int idx){
@@ -84,15 +100,36 @@ public class AddTransactionActivity extends Activity {
         EditText descEdit = (EditText) findViewById(R.id.desc_edit);
         Spinner descSpinner = (Spinner) findViewById(R.id.desc_spinner);
 
-        if(JBudget.get().categories.get(idx).hasSubCategories())
+        JCategory cat = JBudget.get().categories.get(idx);
+        if(cat.hasSubCategories())
         {
-
             fillSubCategorySpinner(descSpinner, idx);
+            if(mEditTransactionIndex > 0)
+            {
+                JTransaction trans = JBudget.get().transactionList.get(mEditTransactionIndex);
+
+                for(int k = 0; k < cat.subCategories.size(); k++)
+                {
+                    if(cat.subCategories.get(k).heading.equals(trans.description))
+                    {
+                        descSpinner.setSelection(k);
+                        break;
+                    }
+                }
+            }
+
             descSpinner.setVisibility(View.VISIBLE);
             descEdit.setVisibility(View.GONE);
         }
         else
         {
+
+            if(mEditTransactionIndex > 0)
+            {
+                JTransaction trans = JBudget.get().transactionList.get(mEditTransactionIndex);
+                descEdit.setText(trans.description);
+            }
+
             descSpinner.setVisibility(View.GONE);
             descEdit.setVisibility(View.VISIBLE);
         }
@@ -146,8 +183,15 @@ public class AddTransactionActivity extends Activity {
             amount = Float.valueOf(amountString);
 
         //Log.d("Main", "Add " + cat + desc + " " + amount);
+        if(mEditTransactionIndex > 0)
+        {
+            JBudget.get().transactionList.set(mEditTransactionIndex, new JTransaction(desc, cat, amount));
+        }
+        else
+        {
+            JBudget.get().transactionList.add(new JTransaction(desc, cat, amount));
+        }
 
-        JBudget.get().transactionList.add(new JTransaction(desc, cat, amount));
         JBudget.get().budgetChanged();
 
         finish();

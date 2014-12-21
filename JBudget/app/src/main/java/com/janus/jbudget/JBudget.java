@@ -545,6 +545,17 @@ public class JBudget {
 		}
 
 		return balance;
-	}    
+	}
+
+    public int getCategoryIndex(String heading) {
+
+        for(int k = 0; k < categories.size(); k++)
+        {
+            if(categories.get(k).heading.equals(heading))
+                return k;
+        }
+
+        return -1;
+    }
 
 }
