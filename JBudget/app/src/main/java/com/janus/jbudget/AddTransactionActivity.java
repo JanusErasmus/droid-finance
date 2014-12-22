@@ -2,7 +2,9 @@ package com.janus.jbudget;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.GestureDetector;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -58,6 +60,21 @@ public class AddTransactionActivity extends Activity {
         //ensure the first in the list is selected
         spin.setSelection(0);
         categorySelectionChangeCallback(0);
+
+        final GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener(){
+            public boolean onDoubleTap(MotionEvent e) {
+                EditText amountEdit = (EditText) findViewById(R.id.amount_edit);
+                amountEdit.setText(amountEdit.getHint());
+                return true;
+            }
+        });
+
+        EditText amountEdit = (EditText) findViewById(R.id.amount_edit);
+        amountEdit.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                return gestureDetector.onTouchEvent(event);
+            }
+        });
 
 
     }
