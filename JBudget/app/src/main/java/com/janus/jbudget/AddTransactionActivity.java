@@ -2,7 +2,6 @@ package com.janus.jbudget;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -48,7 +47,7 @@ public class AddTransactionActivity extends Activity {
             mEditTransactionIndex = b.getInt(ARG_TRANS_DIALOG_INDEX);
 
 
-        if(mEditTransactionIndex > 0)
+        if(mEditTransactionIndex >= 0)
         {
             fillActivity(JBudget.get().transactionList.get(mEditTransactionIndex));
             Button btn = (Button) findViewById(R.id.ok_button);
@@ -95,6 +94,25 @@ public class AddTransactionActivity extends Activity {
         desc.setAdapter(subCatAdapter);
     }
 
+    public void setAmountCallback(int catIndex, int subCatIndex) {
+
+        float amount;
+        if(subCatIndex >= 0)
+        {
+            Spinner catSpinner = (Spinner) findViewById(R.id.cat_spinner);
+            catIndex = catSpinner.getSelectedItemPosition();
+
+            amount = JBudget.get().categoryBalance.get(catIndex).subCategories.get(subCatIndex).amount;
+        }
+        else
+        {
+            amount = JBudget.get().categoryBalance.get(catIndex).amount;
+        }
+
+        EditText amountEdit = (EditText) findViewById(R.id.amount_edit);
+        amountEdit.setHint(String.valueOf(amount));
+    }
+
     public void categorySelectionChangeCallback(int idx) {
 
         EditText descEdit = (EditText) findViewById(R.id.desc_edit);
@@ -104,7 +122,9 @@ public class AddTransactionActivity extends Activity {
         if(cat.hasSubCategories())
         {
             fillSubCategorySpinner(descSpinner, idx);
-            if(mEditTransactionIndex > 0)
+            descSpinner.setOnItemSelectedListener(new OnSubCategorySelectListener(this));
+
+            if(mEditTransactionIndex >= 0)
             {
                 JTransaction trans = JBudget.get().transactionList.get(mEditTransactionIndex);
 
@@ -124,10 +144,14 @@ public class AddTransactionActivity extends Activity {
         else
         {
 
-            if(mEditTransactionIndex > 0)
+            if(mEditTransactionIndex >= 0)
             {
                 JTransaction trans = JBudget.get().transactionList.get(mEditTransactionIndex);
                 descEdit.setText(trans.description);
+            }
+            else
+            {
+                setAmountCallback(idx, -1);
             }
 
             descSpinner.setVisibility(View.GONE);
@@ -183,7 +207,7 @@ public class AddTransactionActivity extends Activity {
             amount = Float.valueOf(amountString);
 
         //Log.d("Main", "Add " + cat + desc + " " + amount);
-        if(mEditTransactionIndex > 0)
+        if(mEditTransactionIndex >= 0)
         {
             JBudget.get().transactionList.set(mEditTransactionIndex, new JTransaction(desc, cat, amount));
         }
