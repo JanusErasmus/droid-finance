@@ -1,15 +1,15 @@
 package com.janus.jbudget;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
+
+import java.text.NumberFormat;
 
 public class SummaryFragment extends Fragment {
     /**
@@ -57,6 +57,8 @@ public class SummaryFragment extends Fragment {
         );
         listView.setAdapter(mAdapter);
 
+        setBankBalance(view);
+
         return view;
     }
 
@@ -72,6 +74,16 @@ public class SummaryFragment extends Fragment {
 
         if(mAdapter != null) {
             mAdapter.notifyDataSetChanged();
+
+            setBankBalance(getView());
         }
+    }
+
+    private void setBankBalance(View view) {
+
+        TextView name = (TextView) view.findViewById(R.id.bank_balance);
+        NumberFormat formatter = NumberFormat.getCurrencyInstance();
+        String balanceString = formatter.format(JBudget.get().getBalance());
+        name.setText(getString(R.string.balance_summary) + " " + balanceString);
     }
 }

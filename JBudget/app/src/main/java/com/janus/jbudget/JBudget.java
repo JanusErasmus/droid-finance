@@ -36,6 +36,7 @@ public class JBudget {
     private int mVersion;
     private float mIncome;
     private float mBank;
+    private float mBankBalance;
 
     static public void init() {
         if (__instance == null) {
@@ -516,8 +517,18 @@ public class JBudget {
 			}
 
 			categoryBalance.add(parent);
-		}		
+		}
+
+        mBankBalance = mIncome;
+        for(JTransaction tr : transactionList)
+        {
+            mBankBalance -= tr.amount;
+        }
 	}
+
+    public float getBalance() {
+        return mBankBalance;
+    }
 
 	private float getBalance(JCategory parent) {
 
