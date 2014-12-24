@@ -3,11 +3,17 @@ package com.janus.jbudget;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.NumberFormat;
 
@@ -81,9 +87,10 @@ public class SummaryFragment extends Fragment {
 
     private void setBankBalance(View view) {
 
-        TextView name = (TextView) view.findViewById(R.id.bank_balance);
         NumberFormat formatter = NumberFormat.getCurrencyInstance();
         String balanceString = formatter.format(JBudget.get().getBalance());
+
+        TextView name = (TextView) view.findViewById(R.id.bank_balance);
         name.setText(getString(R.string.balance_summary) + " " + balanceString);
     }
 }
