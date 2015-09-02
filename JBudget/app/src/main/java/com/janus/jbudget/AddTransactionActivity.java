@@ -2,6 +2,7 @@ package com.janus.jbudget;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -48,11 +49,18 @@ public class AddTransactionActivity extends Activity {
         if(b != null)
             mEditTransactionIndex = b.getInt(ARG_TRANS_DIALOG_INDEX);
 
+        Button btn = (Button) findViewById(R.id.ok_button);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                AddTransaction(arg0);
+            }
+        });
 
         if(mEditTransactionIndex >= 0)
         {
             fillActivity(JBudget.get().transactionList.get(mEditTransactionIndex));
-            Button btn = (Button) findViewById(R.id.ok_button);
+
             btn.setText("Update");
             return;
         }
@@ -191,8 +199,6 @@ public class AddTransactionActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-
-
     public void AddTransaction(View view) {
 
         if(view == null)
@@ -237,4 +243,6 @@ public class AddTransactionActivity extends Activity {
 
         finish();
     }
+
+
 }
